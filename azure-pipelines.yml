@@ -104,6 +104,7 @@ steps:
       make install
       export TEST_APIM_RG=$(TEST_APIM_RG)
       export TEST_APIM_NAME=$(TEST_APIM_NAME)
+      echo $AZURE_CLIENT_SECRET
       make test-integration-controllers
     displayName: Run tests on a Kind Cluster
     continueOnError: 'false'
