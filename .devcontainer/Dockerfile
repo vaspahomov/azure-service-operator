@@ -18,14 +18,16 @@ RUN apt-get update \
 COPY install-dependencies.sh .
 RUN ./install-dependencies.sh devcontainer && rm install-dependencies.sh
 
-# Add kubebuilder to PATH
-ENV PATH=$PATH:/usr/local/kubebuilder/bin
-
-# Add further bash customizations
-# note that the base image includes oh-my-bash, we are enabling plugins here
-# TODO: restore oh-my-bash? it was removed in base image.
-# RUN sed -i '/^plugins=/a kubectl\ngolang' "/home/vscode/.bashrc"
-# RUN sed -i '/^completions=/a kubectl\ngo\ntask' "/home/vscode/.bashrc"
+# Setup envtest
+# NB: if you change this, dev.sh also likely needs updating
+USER vscode
+# - install binaries (these go to HOME which is why we switch user)
+RUN setup-envtest use 1.21.x 
+# - add setup to .bashrc; first the KUBEBUILDER_ASSETS variable
+RUN echo 'source <(setup-envtest use -i -p env)' >> "/home/vscode/.bashrc"
+# - also add KUBEBUILDER_ASSETS to path
+RUN echo 'export PATH=$KUBEBUILDER_ASSETS:$PATH' >> "/home/vscode/.bashrc"
+USER root
 
 # Make kubectl completions work with 'k' alias
 RUN echo 'alias k=kubectl' >> "/home/vscode/.bashrc"

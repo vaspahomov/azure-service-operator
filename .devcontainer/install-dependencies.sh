@@ -69,13 +69,9 @@ fi
 echo "Installing go-task…"
 curl -sL "https://github.com/go-task/task/releases/download/v3.7.0/task_linux_amd64.tar.gz" | tar xz -C "$TOOL_DEST" task
 
-# Install kubebuilder
-os=$(go env GOOS)
-arch=$(go env GOARCH)
-kubebuilder_version=2.3.1
-echo "Installing kubebuilder ${kubebuilder_version} ($os $arch)…"
-curl -L "https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${kubebuilder_version}/kubebuilder_${kubebuilder_version}_${os}_${arch}.tar.gz" | tar -xz -C /tmp/
-mv "/tmp/kubebuilder_${kubebuilder_version}_${os}_${arch}" "$KUBEBUILDER_DEST"
+# Install envtest tooling - ideally version here should match that used in v2/go.mod, but only @latest works
+echo "Installing setup-envtest…"
+go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
 
 # Install yq
 echo "Installing yq…"
@@ -84,7 +80,6 @@ yq_binary=yq_linux_amd64
 wget "https://github.com/mikefarah/yq/releases/download/${yq_version}/${yq_binary}.tar.gz" -O - | tar -xz -C "$TOOL_DEST" && mv "$TOOL_DEST/$yq_binary" "$TOOL_DEST/yq"
 
 echo "Installed tools: $(ls "$TOOL_DEST")"
-
 
 if [ "$1" = "devcontainer" ]; then 
     echo "Setting up k8s webhook certificates"
